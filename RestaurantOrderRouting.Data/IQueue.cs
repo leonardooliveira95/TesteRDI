@@ -9,7 +9,7 @@ namespace RestaurantOrderRouting.Data
     public interface IQueue<TModel> where TModel : AbstractModel
     {
         Task<IEnumerable<TModel>> List();
-        Task<TModel> Dequeue(Guid id);
+        Task<TModel> Dequeue();
         Task<TModel> Enqueue(TModel item);
         Task<TModel> Peek(TModel item);
         Task<int> Count();

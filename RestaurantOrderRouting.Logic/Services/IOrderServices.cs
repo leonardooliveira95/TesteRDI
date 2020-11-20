@@ -9,5 +9,6 @@ namespace RestaurantOrderRouting.Logic.Services
     public interface IOrderServices
     {
         Task<List<OrderSimple>> FetchAllOrders();
+        Task<Order> GetNextOrder();
     }
 }

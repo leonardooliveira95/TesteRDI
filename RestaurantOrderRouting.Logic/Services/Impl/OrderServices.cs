@@ -20,22 +20,38 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
 
         public async Task<List<OrderSimple>> FetchAllOrders()
         {
-            var queueContext = this._queueContextFactory.CreateNew();
-            var queue = queueContext.GetQueue<Order>();
+            IQueue<OrderModel> queue = this.GetQueue();
 
             //FOR TESTING PURPOSES ONLY
             int queueCount = await queue.Count();
-            if (queueCount == 0) 
+            if (queueCount == 0)
             {
                 this.SeedQueue(queue);
             }
-            
-            var ordersInQueue = await queue.List();
+
+            IEnumerable<OrderModel> ordersInQueue = await queue.List();
 
             return this.ConvertOrderToOrderSimple(ordersInQueue);
         }
 
-        private List<OrderSimple> ConvertOrderToOrderSimple(IEnumerable<Order> orders) 
+        public async Task<Order> GetNextOrder()
+        {
+            IQueue<OrderModel> queue = this.GetQueue();
+
+            OrderModel nextOrder = await queue.Dequeue();
+
+            return this.ConvertOrderModelToOrder(nextOrder);
+        }
+
+        private IQueue<OrderModel> GetQueue()
+        {
+            IQueueContext queueContext = this._queueContextFactory.CreateNew();
+            IQueue<OrderModel> queue = queueContext.GetQueue<OrderModel>();
+
+            return queue;
+        }
+
+        private List<OrderSimple> ConvertOrderToOrderSimple(IEnumerable<OrderModel> orders) 
         {
             return orders.Select(order => new OrderSimple
             {
@@ -47,21 +63,39 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
             .ToList();
         }
 
+        private Order ConvertOrderModelToOrder(OrderModel order) 
+        {
+            return new Order
+            {
+                Id = order.Id,
+                OrderDate = order.OrderDate,
+                PaymentType = order.PaymentType,
+                TotalValue = order.TotalValue,
+                Items = order.Items.Select(item => new OrderItem 
+                { 
+                    Id = item.Id,
+                    Name = item.Name,
+                    Value = item.Value
+
+                }).ToList()
+            };
+        }
+
         //FOR TESTING PURPOSES ONLY
-        private void SeedQueue(IQueue<Order> queue)
+        private void SeedQueue(IQueue<OrderModel> queue)
         {
             for (int i = 0; i < 100; ++i)
             {
-                queue.Enqueue(new Order
+                queue.Enqueue(new OrderModel
                 {
                     Id = Guid.NewGuid(),
                     OrderDate = DateTime.Now,
                     PaymentType = (PaymentTypeEnum)(i % 4),
                     TotalValue = i * 100,
-                    Items = new List<OrderItem>() 
-                    { 
-                        new OrderItem 
-                        { 
+                    Items = new List<OrderItemModel>()
+                    {
+                        new OrderItemModel
+                        {
                             Id = Guid.NewGuid(),
                             Name = "Item " + i,
                             Value = i * 100

@@ -23,9 +23,18 @@ namespace RestaurantOrderRouting.Data.Impl
             return Task.FromResult(item);
         }
 
-        public Task<TModel> Dequeue(Guid id)
+        public Task<TModel> Dequeue()
         {
-            throw new NotImplementedException();
+            TModel item;
+
+            if (!this._queue.TryDequeue(out item))
+            {
+                throw new Exception("Unexpected error while removing item from queue");
+            }
+            else 
+            {
+                return Task.FromResult(item);
+            }
         }
 
         public Task<IEnumerable<TModel>> List()

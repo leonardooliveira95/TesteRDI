@@ -14,7 +14,7 @@ namespace RestaurantOrderRouting.Data.Impl
             throw new NotImplementedException();
         }
 
-        public Task<TModel> Dequeue(Guid id)
+        public Task<TModel> Dequeue()
         {
             throw new NotImplementedException();
         }

@@ -33,5 +33,17 @@ namespace RestaurantOrderRouting.Controllers
             List<OrderSimple> result = await _orderServices.FetchAllOrders();
             return result;
         }
+
+        /// <summary>
+        /// Gets the next order on the queue
+        /// </summary>
+        /// <returns> Next order on the queue </returns>
+        [HttpGet]
+        [Route("get-next")]
+        public async Task<Order> GetNext()
+        {
+            Order result = await _orderServices.GetNextOrder();
+            return result;
+        }
     }
 }
