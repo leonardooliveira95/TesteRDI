@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RestaurantOrderRouting.Common\RestaurantOrderRouting.Common.csproj" />
     <ProjectReference Include="..\RestaurantOrderRouting.Data\RestaurantOrderRouting.Data.csproj" />
   </ItemGroup>
 

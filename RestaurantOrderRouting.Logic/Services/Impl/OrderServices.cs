@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using RestaurantOrderRouting.Common;
 
 namespace RestaurantOrderRouting.Logic.Services.Impl
 {
@@ -22,13 +23,6 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
         {
             IQueue<OrderModel> queue = this.GetQueue();
 
-            //FOR TESTING PURPOSES ONLY
-            int queueCount = await queue.Count();
-            if (queueCount == 0)
-            {
-                this.SeedQueue(queue);
-            }
-
             IEnumerable<OrderModel> ordersInQueue = await queue.List();
 
             return this.ConvertOrderToOrderSimple(ordersInQueue);
@@ -43,6 +37,17 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
             return this.ConvertOrderModelToOrder(nextOrder);
         }
 
+        public async Task<Order> CreateNewOrder(Order order)
+        {
+            IQueue<OrderModel> queue = this.GetQueue();
+
+            this.ValidateOrder(order);
+
+            OrderModel created = await queue.Enqueue(this.ConvertOrderToOrderModel(order));
+
+            return this.ConvertOrderModelToOrder(created);
+        }
+
         private IQueue<OrderModel> GetQueue()
         {
             IQueueContext queueContext = this._queueContextFactory.CreateNew();
@@ -53,6 +58,9 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
 
         private List<OrderSimple> ConvertOrderToOrderSimple(IEnumerable<OrderModel> orders) 
         {
+            if (orders == null)
+                return null;
+
             return orders.Select(order => new OrderSimple
             {
                 TotalValue = order.TotalValue,
@@ -65,6 +73,9 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
 
         private Order ConvertOrderModelToOrder(OrderModel order) 
         {
+            if (order == null)
+                return null;
+
             return new Order
             {
                 Id = order.Id,
@@ -81,27 +92,42 @@ namespace RestaurantOrderRouting.Logic.Services.Impl
             };
         }
 
-        //FOR TESTING PURPOSES ONLY
-        private void SeedQueue(IQueue<OrderModel> queue)
+        private OrderModel ConvertOrderToOrderModel(Order order) 
         {
-            for (int i = 0; i < 100; ++i)
+            if (order == null)
+                return null;
+
+            return new OrderModel
             {
-                queue.Enqueue(new OrderModel
-                {
+                Id = Guid.NewGuid(),
+                OrderDate = DateTime.Now,
+                PaymentType = order.PaymentType,
+                TotalValue = order.TotalValue,
+                Items = order.Items.Select(item => new OrderItemModel 
+                { 
                     Id = Guid.NewGuid(),
-                    OrderDate = DateTime.Now,
-                    PaymentType = (PaymentTypeEnum)(i % 4),
-                    TotalValue = i * 100,
-                    Items = new List<OrderItemModel>()
-                    {
-                        new OrderItemModel
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = "Item " + i,
-                            Value = i * 100
-                        }
-                    }
-                });
+                    Name = item.Name,
+                    Value = item.Value
+                })
+                .ToList()
+            };
+        }
+
+        private void ValidateOrder(Order order) 
+        {
+            if (order == null) 
+            {
+                throw new BusinessException("Order cannot be empty");
+            }
+
+            if (order.Items == null || order.Items.Count == 0) 
+            {
+                throw new BusinessException("The order has no items");
+            }
+
+            if (order.TotalValue <= 0) 
+            {
+                throw new BusinessException("Order value cannot be less or equal to 0");
             }
         }
     }

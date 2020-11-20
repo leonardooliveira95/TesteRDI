@@ -10,5 +10,6 @@ namespace RestaurantOrderRouting.Logic.Services
     {
         Task<List<OrderSimple>> FetchAllOrders();
         Task<Order> GetNextOrder();
+        Task<Order> CreateNewOrder(Order order);
     }
 }

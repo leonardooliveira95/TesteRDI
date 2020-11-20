@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RestaurantOrderRouting.Common\RestaurantOrderRouting.Common.csproj" />
     <ProjectReference Include="..\RestaurantOrderRouting.Logic\RestaurantOrderRouting.Logic.csproj" />
   </ItemGroup>
 

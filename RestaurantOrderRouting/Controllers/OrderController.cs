@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RestaurantOrderRouting.Common;
 using RestaurantOrderRouting.Logic.Models;
 using RestaurantOrderRouting.Logic.Services;
 using System;
@@ -44,6 +45,25 @@ namespace RestaurantOrderRouting.Controllers
         {
             Order result = await _orderServices.GetNextOrder();
             return result;
+        }
+
+        /// <summary>
+        /// Creates a new order
+        /// </summary>
+        /// <returns> Created order </returns>
+        [HttpPost]
+        [Route("create-new")]
+        public async Task<IActionResult> CreateNew([FromBody]Order order)
+        {
+            try
+            {
+                Order result = await _orderServices.CreateNewOrder(order);
+                return Ok(result);
+            }
+            catch (BusinessException ex) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

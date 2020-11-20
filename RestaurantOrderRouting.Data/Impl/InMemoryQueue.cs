@@ -25,7 +25,12 @@ namespace RestaurantOrderRouting.Data.Impl
 
         public Task<TModel> Dequeue()
         {
-            TModel item;
+            TModel item = default;
+
+            if (this._queue.Count() == 0) 
+            {
+                return Task.FromResult(item);
+            }
 
             if (!this._queue.TryDequeue(out item))
             {
