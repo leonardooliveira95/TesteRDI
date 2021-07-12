@@ -54,9 +54,23 @@ namespace RestaurantOrderRouting.Data.Impl
             return Task.FromResult(result.AsEnumerable());
         }
 
-        public Task<TModel> Peek(TModel item)
+        public Task<TModel> Peek()
         {
-            throw new NotImplementedException();
+            TModel item = default;
+
+            if (this._queue.Count() == 0)
+            {
+                return Task.FromResult(item);
+            }
+
+            if (!this._queue.TryPeek(out item))
+            {
+                throw new Exception("Unexpected error while removing item from queue");
+            }
+            else
+            {
+                return Task.FromResult(item);
+            }
         }
 
         public Task<int> Count()

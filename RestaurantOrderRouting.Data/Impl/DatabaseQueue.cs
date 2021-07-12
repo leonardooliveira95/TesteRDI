@@ -24,7 +24,7 @@ namespace RestaurantOrderRouting.Data.Impl
             throw new NotImplementedException();
         }
 
-        public Task<TModel> Peek(TModel item)
+        public Task<TModel> Peek()
         {
             throw new NotImplementedException();
         }

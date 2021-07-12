@@ -11,7 +11,7 @@ namespace RestaurantOrderRouting.Data
         Task<IEnumerable<TModel>> List();
         Task<TModel> Dequeue();
         Task<TModel> Enqueue(TModel item);
-        Task<TModel> Peek(TModel item);
+        Task<TModel> Peek();
         Task<int> Count();
     }
 }
